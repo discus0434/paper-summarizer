@@ -44,7 +44,7 @@ If you do not use CUDA (i.e., you use only CPU), you can modify `Dockerfile` as 
 Then, build a Docker image:
 
 ```bash
-cd paper-summarizer/docker && make run
+cd paper-summarizer/docker && make build
 ```
 
 ### 4. Set environment variables
@@ -65,6 +65,14 @@ You can run the API with the following command:
 
 ```bash
 make run
+```
+
+If your PC is Windows, run below instead:
+
+```bash
+make run-win
+docker exec -it <container id>
+python3 app.py
 ```
 
 Then, forward the port by using [ngrok](https://ngrok.com/) or something like that.
