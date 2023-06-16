@@ -10,6 +10,13 @@ class APIInterface:
     """
     A class to interact with the API for downloading, extracting text,
     and summarizing research papers.
+
+    Attributes
+    ----------
+    ocr_model : OCRModel
+        The OCRModel instance, which uses the PadddleOCR.
+    summarizer : Summarizer
+        The Summarizer instance, which uses the OpenAI API.
     """
 
     def __init__(self, model: str = "gpt-3.5-turbo-16k-0613", max_length: int = 16000):
