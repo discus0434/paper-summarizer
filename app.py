@@ -46,9 +46,6 @@ class SummarizeRequest(BaseModel):
         ValueError
             If the text does not contain arXiv ID.
         """
-        if v is None:
-            return v
-
         # check if the text contains arXiv ID (e.g. 2101.00001)
         if not re.search(r"\d{4}\.\d{5}", v["text"]):
             raise ValueError("The text must contain arXiv ID.")
@@ -75,9 +72,6 @@ class SummarizeRequest(BaseModel):
         ValueError
             If the event is not app_mention.
         """
-        if v is None:
-            return v
-
         # check if the event is app_mention
         if v["type"] != "app_mention":
             raise ValueError("The event must be app_mention.")
@@ -106,9 +100,6 @@ class SummarizeRequest(BaseModel):
         ValueError
             If the client_msg_id is deplicated.
         """
-        if v is None:
-            return v
-
         # check if the client_msd_id is deplicated
         if os.path.exists("msg_id.log"):
             with open("msg_id.log", "r") as f:
@@ -184,34 +175,6 @@ class SummarizerAPI:
         scheduler = AsyncIOScheduler()
         scheduler.add_job(self.api_interface.daily_summary, IntervalTrigger(hours=24))
         scheduler.start()
-
-    async def slack_challenge(self, data: dict) -> str:
-        """
-        Respond to the Slack challenge request.
-
-        Parameters
-        ----------
-        data : dict
-            The request body of the Slack challenge request.
-
-        Notes
-        -----
-        This method is only used at the first handshake with Slack.
-        At that time, Slack sends a challenge request to the API.
-        The API must respond with the challenge value in the specific
-        request body.
-
-        In the situation, you have to modify the api route of
-        summarization like below:
-
-        >>> self.app.add_api_route(
-        >>>     "/summarize",
-        >>>     self.slack_challenge,
-        >>>     methods=["POST"],
-        >>>     response_class=PlainTextResponse,
-        >>> )
-        """
-        return data["challenge"]
 
 
 if __name__ == "__main__":
