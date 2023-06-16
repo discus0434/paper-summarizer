@@ -1,6 +1,6 @@
 # Paper Summarizer
 
-**A Slack Bot of paper summarizer for arXiv papers, powered by OpenAI LLMs.**
+**A Slack Bot of paper summarization for arXiv papers, powered by OpenAI LLMs.**
 
 <p align="center">
   <img src="./assets/example.gif" width=100%>
