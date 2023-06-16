@@ -67,11 +67,11 @@ You can run the API with the following command:
 make run
 ```
 
-If your PC is Windows, run below instead:
+If your PC is Windows, run below in git bash:
 
 ```bash
 make run-win
-docker exec -it <container id>
+docker exec -it <container id> bash
 python3 app.py
 ```
 
