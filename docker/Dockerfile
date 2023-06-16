@@ -13,9 +13,9 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /tmp/* /var/tmp/* \
-    && mkdir -p /home/pdf-summarizer
+    && mkdir -p /home/paper-summarizer
 
-WORKDIR /home/pdf-summarizer
+WORKDIR /home/paper-summarizer
 
 RUN pip install --no-cache-dir opencv-python-headless \
     arxiv \
