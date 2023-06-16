@@ -1,6 +1,6 @@
 import os
 import re
-from typing import Dict
+from typing import Dict, Optional, Union
 
 import uvicorn
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -23,21 +23,22 @@ class SummarizeRequest(BaseModel):
 
     token: str
     type: str
-    event: Dict
+    event: Optional[Dict]
+    challenge: Optional[str]
 
     @validator("event")
-    def event_text_must_contain_arxiv_id(cls, v: Dict) -> Dict:
+    def event_text_must_contain_arxiv_id(cls, v: Optional[Dict]) -> Optional[Dict]:
         """
         Validate the event text to contain arXiv ID.
 
         Parameters
         ----------
-        v : Dict
-            The event dictionary.
+        v : Optional[Dict]
+            The event dictionary (optional).
 
         Returns
         -------
-        Dict
+        v : Optional[Dict]
             The event dictionary if the text contains arXiv ID.
 
         Raises
@@ -52,18 +53,18 @@ class SummarizeRequest(BaseModel):
         return v
 
     @validator("event")
-    def event_must_be_app_mention(cls, v: Dict) -> Dict:
+    def event_must_be_app_mention(cls, v: Optional[Dict]) -> Optional[Dict]:
         """
         Validate the event to be app_mention.
 
         Parameters
         ----------
-        v : Dict
-            The event dictionary.
+        v : Optional[Dict]
+            The event dictionary (optional).
 
         Returns
         -------
-        v : Dict
+        v : Optional[Dict]
             The event dictionary if the event is app_mention.
 
         Raises
@@ -78,7 +79,7 @@ class SummarizeRequest(BaseModel):
         return v
 
     @validator("event")
-    def event_client_msg_id_is_unique(cls, v: Dict) -> Dict:
+    def event_client_msg_id_is_unique(cls, v: Optional[Dict]) -> Optional[Dict]:
         """
         Validate the client_msg_id to be unique.
         If the client_msg_id is unique, save it to the ts.log file.
@@ -86,12 +87,12 @@ class SummarizeRequest(BaseModel):
 
         Parameters
         ----------
-        v : Dict
-            The event dictionary.
+        v : Optional[Dict]
+            The event dictionary (optional).
 
         Returns
         -------
-        v : Dict
+        v : Optional[Dict]
             The event dictionary if the client_msg_id is unique.
 
         Raises
@@ -142,7 +143,7 @@ class SummarizerAPI:
         """
         uvicorn.run(self.app, host="0.0.0.0", port=8760)
 
-    async def summarize(self, payload: SummarizeRequest) -> None:
+    async def summarize(self, payload: SummarizeRequest) -> Union[str, None]:
         """
         Summarize the given arXiv paper.
 
@@ -157,6 +158,8 @@ class SummarizerAPI:
         Exception
             If the request is invalid.
         """
+        if payload.challenge is not None:
+            return payload.challenge
 
         try:
             self.api_interface.summarize(
@@ -172,34 +175,6 @@ class SummarizerAPI:
         scheduler = AsyncIOScheduler()
         scheduler.add_job(self.api_interface.daily_summary, IntervalTrigger(hours=24))
         scheduler.start()
-
-    async def slack_challenge(self, data: dict) -> str:
-        """
-        Respond to the Slack challenge request.
-
-        Parameters
-        ----------
-        data : dict
-            The request body of the Slack challenge request.
-
-        Notes
-        -----
-        This method is only used at the first handshake with Slack.
-        At that time, Slack sends a challenge request to the API.
-        The API must respond with the challenge value in the specific
-        request body.
-
-        In the situation, you have to modify the api route of
-        summarization like below:
-
-        >>> self.app.add_api_route(
-        >>>     "/summarize",
-        >>>     self.slack_challenge,
-        >>>     methods=["POST"],
-        >>>     response_class=PlainTextResponse,
-        >>> )
-        """
-        return data["challenge"]
 
 
 if __name__ == "__main__":
