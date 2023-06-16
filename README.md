@@ -22,7 +22,7 @@ Currently, the bot supports only papers posted on [arXiv](https://arxiv.org/).
 - OpenAI: [https://platform.openai.com/account/api-keys](hhttps://platform.openai.com/account/api-keys)
 - Slack: [https://api.slack.com/apps](https://api.slack.com/apps)
 
-### 1. Add the bot to your Slack workspace and make it be able to read / write messages
+### 1. Add the bot to your Slack workspace and make it be able to react with user's mention
 
 - This article may be helpful: [Enabling interactions with bots](https://api.slack.com/bot-users)
 
