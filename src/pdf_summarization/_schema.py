@@ -7,6 +7,15 @@ class ArxivInfo:
     """
     A dataclass that contains the title,abstract and path of an arXiv
     paper.
+
+    Attributes
+    ----------
+    title : str
+        The title of the paper.
+    abstract : str
+        The abstract of the paper.
+    path : Path
+        The path of the paper.
     """
 
     title: str
