@@ -1,4 +1,4 @@
-NAME=pdf-summarizer
+NAME=paper-summarizer
 TAG=0.1.0
 PROJECT_DIRECTORY=$(shell pwd)/..
 
