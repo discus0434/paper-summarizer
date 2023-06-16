@@ -1,6 +1,6 @@
 import os
 import re
-from typing import Dict
+from typing import Dict, Optional, Union
 
 import uvicorn
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -23,21 +23,22 @@ class SummarizeRequest(BaseModel):
 
     token: str
     type: str
-    event: Dict
+    event: Optional[Dict]
+    challenge: Optional[str]
 
     @validator("event")
-    def event_text_must_contain_arxiv_id(cls, v: Dict) -> Dict:
+    def event_text_must_contain_arxiv_id(cls, v: Optional[Dict]) -> Optional[Dict]:
         """
         Validate the event text to contain arXiv ID.
 
         Parameters
         ----------
-        v : Dict
-            The event dictionary.
+        v : Optional[Dict]
+            The event dictionary (optional).
 
         Returns
         -------
-        Dict
+        v : Optional[Dict]
             The event dictionary if the text contains arXiv ID.
 
         Raises
@@ -45,6 +46,9 @@ class SummarizeRequest(BaseModel):
         ValueError
             If the text does not contain arXiv ID.
         """
+        if v is None:
+            return v
+
         # check if the text contains arXiv ID (e.g. 2101.00001)
         if not re.search(r"\d{4}\.\d{5}", v["text"]):
             raise ValueError("The text must contain arXiv ID.")
@@ -52,18 +56,18 @@ class SummarizeRequest(BaseModel):
         return v
 
     @validator("event")
-    def event_must_be_app_mention(cls, v: Dict) -> Dict:
+    def event_must_be_app_mention(cls, v: Optional[Dict]) -> Optional[Dict]:
         """
         Validate the event to be app_mention.
 
         Parameters
         ----------
-        v : Dict
-            The event dictionary.
+        v : Optional[Dict]
+            The event dictionary (optional).
 
         Returns
         -------
-        v : Dict
+        v : Optional[Dict]
             The event dictionary if the event is app_mention.
 
         Raises
@@ -71,6 +75,9 @@ class SummarizeRequest(BaseModel):
         ValueError
             If the event is not app_mention.
         """
+        if v is None:
+            return v
+
         # check if the event is app_mention
         if v["type"] != "app_mention":
             raise ValueError("The event must be app_mention.")
@@ -78,7 +85,7 @@ class SummarizeRequest(BaseModel):
         return v
 
     @validator("event")
-    def event_client_msg_id_is_unique(cls, v: Dict) -> Dict:
+    def event_client_msg_id_is_unique(cls, v: Optional[Dict]) -> Optional[Dict]:
         """
         Validate the client_msg_id to be unique.
         If the client_msg_id is unique, save it to the ts.log file.
@@ -86,12 +93,12 @@ class SummarizeRequest(BaseModel):
 
         Parameters
         ----------
-        v : Dict
-            The event dictionary.
+        v : Optional[Dict]
+            The event dictionary (optional).
 
         Returns
         -------
-        v : Dict
+        v : Optional[Dict]
             The event dictionary if the client_msg_id is unique.
 
         Raises
@@ -99,6 +106,9 @@ class SummarizeRequest(BaseModel):
         ValueError
             If the client_msg_id is deplicated.
         """
+        if v is None:
+            return v
+
         # check if the client_msd_id is deplicated
         if os.path.exists("msg_id.log"):
             with open("msg_id.log", "r") as f:
@@ -142,7 +152,7 @@ class SummarizerAPI:
         """
         uvicorn.run(self.app, host="0.0.0.0", port=8760)
 
-    async def summarize(self, payload: SummarizeRequest) -> None:
+    async def summarize(self, payload: SummarizeRequest) -> Union[str, None]:
         """
         Summarize the given arXiv paper.
 
@@ -157,6 +167,8 @@ class SummarizerAPI:
         Exception
             If the request is invalid.
         """
+        if payload.challenge is not None:
+            return payload.challenge
 
         try:
             self.api_interface.summarize(
