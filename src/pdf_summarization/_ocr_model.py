@@ -132,7 +132,7 @@ class OCRModel:
         bool
             True if the text is too long, False otherwise.
         """
-        return len(self.tokenizer(text)["input_ids"]) > self.max_length - 1000
+        return len(self.tokenizer(text)["input_ids"]) > self.max_length - 2000
 
     def __is_unnecessary(self, text: str) -> bool:
         """
