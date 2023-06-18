@@ -36,20 +36,16 @@ class APIInterface:
         self.ocr_model = OCRModel(max_length=max_length)
         self.summarizer = Summarizer(model=model)
 
-    def summarize(self, arxiv_id_or_url: str) -> str:
+    def summarize(self, arxiv_id_or_url: str) -> None:
         """
         Summarize the text of a research paper given its arXiv ID or
         URL.
+        Then, post summarized text of the research paper.
 
         Parameters
         ----------
         arxiv_id_or_url : str
             The arXiv ID or URL of the research paper.
-
-        Returns
-        -------
-        str
-            The summarized text of the research paper.
         """
         # 1. Download the paper from arXiv
         print("Downloading the paper...")
@@ -74,14 +70,11 @@ class APIInterface:
             ]
         )
 
-    def daily_summary(self) -> str:
+    def daily_summary(self) -> None:
         """
         Retrieve and summarize daily research papers from arXiv.
-
-        Returns
-        -------
-        str
-            The concatenated text of the summarized research papers.
+        Then, post concatenated text of the summarized research 
+        papers to slack.
         """
         # 1. Retrieve arXiv IDs
         arxiv_ids = IDRetriever.retrieve_from_hf()
