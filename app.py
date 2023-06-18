@@ -53,7 +53,7 @@ class SummarizeRequest(BaseModel):
         return v
 
     @validator("event")
-    def event_must_be_app_mention(cls, v: Optional[Dict]) -> Optional[Dict]:
+    def event_type_must_be_app_mention(cls, v: Optional[Dict]) -> Optional[Dict]:
         """
         Validate the event to be app_mention.
 
@@ -79,10 +79,10 @@ class SummarizeRequest(BaseModel):
         return v
 
     @validator("event")
-    def event_client_msg_id_is_unique(cls, v: Optional[Dict]) -> Optional[Dict]:
+    def event_client_msg_id_must_be_unique(cls, v: Optional[Dict]) -> Optional[Dict]:
         """
         Validate the client_msg_id to be unique.
-        If the client_msg_id is unique, save it to the ts.log file.
+        If the client_msg_id is unique, save it to the msg_id.log file.
         If deplicated, raise ValueError.
 
         Parameters
@@ -106,7 +106,7 @@ class SummarizeRequest(BaseModel):
                 if v["client_msg_id"] in [ts.strip() for ts in f.readlines()]:
                     raise ValueError("The event arxiv_id is deplicated.")
 
-        # save the event arxiv_id to ts.log
+        # save the event arxiv_id to msg_id.log
         with open("msg_id.log", "a") as f:
             f.write(f"{v['client_msg_id']}\n")
 
