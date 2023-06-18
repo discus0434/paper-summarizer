@@ -7,7 +7,6 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.responses import PlainTextResponse
 from pydantic import BaseModel, validator
 
 from src.pdf_summarization import APIInterface
@@ -133,7 +132,6 @@ class SummarizerAPI:
             "/summarize",
             self.summarize,
             methods=["POST"],
-            response_class=PlainTextResponse,
         )
         self.app.add_event_handler("startup", self.daily_summary)
 
