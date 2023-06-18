@@ -19,7 +19,7 @@ Currently, the bot supports only papers posted on [arXiv](https://arxiv.org/).
 
 ### 0. Get API keys for OpenAI and Slack
 
-- OpenAI: [https://platform.openai.com/account/api-keys](hhttps://platform.openai.com/account/api-keys)
+- OpenAI: [https://platform.openai.com/account/api-keys](https://platform.openai.com/account/api-keys)
 - Slack: [https://api.slack.com/apps](https://api.slack.com/apps)
 
 ### 1. Add the bot to your Slack workspace and make it be able to react with user's mention
