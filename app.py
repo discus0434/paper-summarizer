@@ -139,7 +139,7 @@ class SummarizerAPI:
         """
         Run the FastAPI application using uvicorn.
         """
-        uvicorn.run(self.app, host="0.0.0.0", port=8762)
+        uvicorn.run(self.app, host="0.0.0.0", port=8760)
 
     async def summarize(self, payload: SummarizeRequest) -> Union[str, None]:
         """
