@@ -1,4 +1,4 @@
-FROM paddlepaddle/paddle:2.4.1-gpu-cuda11.2-cudnn8.2-trt8.0
+FROM paddlepaddle/paddle:2.5.0rc0-cpu
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NOWARNINGS=yes

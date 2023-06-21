@@ -1,6 +1,8 @@
+from asyncio import futures
 import re
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Tuple
+from concurrent.futures import ThreadPoolExecutor
 
 import nltk
 import numpy as np
@@ -50,7 +52,7 @@ class OCRModel:
 
     def extract_text(self, pdf_file: Union[Path, bytes]) -> Union[str, None]:
         """
-        Extract text from a PDF file.
+        Extract text from a PDF file in parallel.
         If the extracted text is too long, return None instead.
 
         Parameters
@@ -62,16 +64,45 @@ class OCRModel:
         -------
         str
             The extracted text.
+            If the extracted text is too long, return None instead.
         """
         texts = []
         pil_images = self.__convert_pdf_to_pil(pdf_file)
-        for pil_image in tqdm(pil_images):
-            result = self.layout_model(np.array(pil_image, dtype=np.uint8))
-            for line in result:
+        with ThreadPoolExecutor(max_workers=8) as executor:
+            results = executor.map(self.__extract_text_from_one_page, pil_images)
+            for result in tqdm(results, total=len(pil_images)):
+                texts.extend(list(result[0]))
+                if result[1]:
+                    break
+
+
+        if not self.__is_too_long("\n".join(texts)):
+            return "\n".join(texts)
+        else:
+            return None
+
+    def __extract_text_from_one_page(self, pil_image: Image.Image) -> Tuple[List[str], bool]:
+        """
+        Extract text from a PIL image of one page.
+
+        Parameters
+        ----------
+        pil_image : Image.Image
+            The PIL image to extract text from.
+
+        Returns
+        -------
+        List[str]
+            The extracted text.
+        bool
+            Whether the text extraction should be stopped.
+        """
+        texts = []
+        result = self.layout_model(np.array(pil_image, dtype=np.uint8))
+        for line in result:
+            try:
                 if not line["type"] == "title":
-                    ocr_results = list(
-                        map(lambda x: x[0], self.ocr_model(line["img"])[1])
-                    )
+                    ocr_results = list(map(lambda x: x[0], self.ocr_model(line["img"])[1]))
 
                     if len(ocr_results) > 1:
                         text = " ".join(ocr_results)
@@ -91,13 +122,13 @@ class OCRModel:
                     # because the following text is references and appendices
                     # which are might be unnecessary for our purpose
                     if title.lower() == "references" or title.lower() == "reference":
-                        break
+                        return texts, True
                     texts.append(title)
+            except Exception as e:
+                print(e)
+                continue
 
-        if not self.__is_too_long("\n".join(texts)):
-            return "\n".join(texts)
-        else:
-            return None
+        return texts, False
 
     def __convert_pdf_to_pil(self, pdf_file: Union[Path, bytes]) -> List[Image.Image]:
         """

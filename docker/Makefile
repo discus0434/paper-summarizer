@@ -9,7 +9,6 @@ run:
 	docker run -it \
 		--name ${NAME} \
 		-v ${PROJECT_DIRECTORY}:/home/${NAME} \
-		--gpus all \
 		-d --restart=always \
 		-p 8760:8760 \
 		${NAME}:${TAG} /bin/bash -c "cd /home/${NAME} && python3 app.py"

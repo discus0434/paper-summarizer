@@ -5,7 +5,7 @@ import requests
 
 def summarize(args: argparse.Namespace) -> None:
     response = requests.post(
-        "http://0.0.0.0:8760/summarize",
+        "http://0.0.0.0:8762/summarize",
         json={
             "token": "Jhj5dZrVaK7ZwHHjRyZWjbDl",
             "type": "app_mention",
@@ -21,7 +21,7 @@ def summarize(args: argparse.Namespace) -> None:
 
 def challenge(args: argparse.Namespace) -> None:
     response = requests.post(
-        "http://0.0.0.0:8760/summarize",
+        "http://0.0.0.0:8762/summarize",
         json={
             "token": "Jhj5dZrVaK7ZwHHjRyZWjbDl",
             "challenge": "3eZbrw1aBm2rZgRNFdxV2595E9CY3gmdALWMmHkvFXO7tYXAYM8P",
