@@ -1,2 +1,5 @@
 env.yaml
 cache/
+*.json
+*.pdf
+*.png

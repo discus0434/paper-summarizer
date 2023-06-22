@@ -43,16 +43,14 @@ test_run:
 		-p 8080:8080 \
 		--env-file ${PROJECT_DIRECTORY}/.env \
 		--env PYTHON_ENV=test \
-		-v ${PROJECT_DIRECTORY}/app.py:/app/app.py \
-		-v ${PROJECT_DIRECTORY}/src:/app/src \
-		${IMAGE_NAME} \
-		gunicorn \
-		 	--bind :8080 \
-			--workers 1 \
-			--worker-class uvicorn.workers.UvicornWorker \
-			--threads 2 \
-			--timeout 0 \
-			app:app
+		-v ${PROJECT_DIRECTORY}/app.py:/home/app.py \
+		-v ${PROJECT_DIRECTORY}/src:/home/src \
+		-v ./cache/.cache:/root/.cache \
+		-v ./cache/.paddleocr:/root/.paddleocr \
+		-v ./radius5-ml-research-18a8df47e1d3.json:/root/radius5-ml-research-18a8df47e1d3.json \
+		--env GOOGLE_APPLICATION_CREDENTIALS=/root/radius5-ml-research-18a8df47e1d3.json \
+		paper-summarizer:0.1.0 \
+		/bin/bash -c "cd /home/${NAME} && uvicorn app:app --reload --port=8080 --host='0.0.0.0'"
 
 run:
 	docker run --rm -it \

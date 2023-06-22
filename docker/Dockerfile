@@ -28,4 +28,5 @@ RUN pip install --no-cache-dir opencv-python-headless \
     openai \
     python-dotenv \
     transformers \
-    nltk
+    nltk \
+    google-cloud-vision

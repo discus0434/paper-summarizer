@@ -1,11 +1,13 @@
 import os
 import re
+from io import BytesIO
 from pathlib import Path
 from typing import List, Union, Tuple
 from concurrent.futures import ThreadPoolExecutor
 
 import nltk
 import numpy as np
+from google.cloud import vision
 from nltk.corpus import words
 from paddleocr import PaddleOCR, PPStructure
 from pdf2image import convert_from_bytes, convert_from_path
@@ -43,12 +45,12 @@ class OCRModel:
             The maximum length of the text to be extracted.
         """
         self.max_length = max_length
-        self.layout_model = PPStructure(table=False, ocr=False, lang="en")
-        self.ocr_model = PaddleOCR(ocr=True, lang="en", ocr_version="PP-OCRv3")
+        # self.layout_model = PPStructure(table=False, ocr=False, lang="en")
+        # self.ocr_model = PaddleOCR(ocr=True, lang="en", ocr_version="PP-OCRv3")
         self.tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
 
         # Download the set of English words
-        nltk.download("words")
+        # nltk.download("words")
 
     def extract_text(self, pdf_file: Union[Path, bytes]) -> Union[str, None]:
         """
@@ -70,7 +72,7 @@ class OCRModel:
         pil_images = self.__convert_pdf_to_pil(pdf_file)
         print("max_workers: ", os.getenv("MAX_WORKERS", 1))
         with ThreadPoolExecutor(max_workers=int(os.getenv("MAX_WORKERS", 1))) as executor:
-            results = executor.map(self.__extract_text_from_one_page, pil_images)
+            results = executor.map(self.__extract_text_from_one_page_with_vision_api, pil_images)
             for result in tqdm(results, total=len(pil_images)):
                 texts.extend(list(result[0]))
                 if result[1]:
@@ -127,6 +129,38 @@ class OCRModel:
             except Exception as e:
                 print(e)
                 continue
+
+        return texts, False
+
+    def __extract_text_from_one_page_with_vision_api(self, pil_image: Image.Image) -> Tuple[List[str], bool]:
+        """
+        Extract text from a PIL image of one page with vision api.
+
+        Parameters
+        ----------
+        pil_image : Image.Image
+            The PIL image to extract text from.
+
+        Returns
+        -------
+        List[str]
+            The extracted text.
+        bool
+            Whether the text extraction should be stopped.
+        """
+        texts = []
+        try:
+            client = vision.ImageAnnotatorClient()
+            buffer = BytesIO()
+            pil_image.save(buffer, format='PNG')
+            vision_image = vision.Image(content=buffer.getvalue())
+            response = client.text_detection(image=vision_image)
+            res_texts = response.text_annotations
+            text = " ".join([x.description for x in res_texts])
+            text = re.sub(r"\n|\t|\/|\|", " ", text)
+            texts.append(text)
+        except Exception as e:
+            print("VISION_API_ERROR:", e)
 
         return texts, False
 
