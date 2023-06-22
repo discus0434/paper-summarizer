@@ -68,4 +68,4 @@ COPY . ./
 
 ENV PORT 8080
 
-CMD exec gunicorn --bind :$PORT --workers 4 --worker-class uvicorn.workers.UvicornWorker --threads 2 --timeout 0 app:app
+CMD exec gunicorn --bind :$PORT --workers 1 --worker-class uvicorn.workers.UvicornWorker --threads 8 --timeout 0 app:app

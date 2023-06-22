@@ -24,9 +24,9 @@ deploy:
 	gcloud run deploy ${GCP_IMAGE_NAME} \
 		--image=${IMAGE_NAME} \
 		--region=${GCP_REGION} \
-		--concurrency=4 \
-		--cpu=4 \
-		--memory=8Gi \
+		--concurrency=1 \
+		--cpu=1 \
+		--memory=4Gi \
 		--min-instances=0 \
 		--max-instances=1 \
 		--port=8080 \
