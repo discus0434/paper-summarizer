@@ -45,8 +45,8 @@ test_run:
 		--env PYTHON_ENV=test \
 		-v ${PROJECT_DIRECTORY}/app.py:/app/app.py \
 		-v ${PROJECT_DIRECTORY}/src:/app/src \
-	 ${IMAGE_NAME} \
-		 gunicorn \
+		${IMAGE_NAME} \
+		gunicorn \
 		 	--bind :8080 \
 			--workers 1 \
 			--worker-class uvicorn.workers.UvicornWorker \
@@ -58,8 +58,8 @@ run:
 	docker run --rm -it \
 		-p 8080:8080 \
 		--env-file ${PROJECT_DIRECTORY}/.env \
-	 ${IMAGE_NAME} \
-		 gunicorn \
+		${IMAGE_NAME} \
+		gunicorn \
 		 	--bind :8080 \
 			--workers 1 \
 			--worker-class uvicorn.workers.UvicornWorker \
@@ -73,3 +73,9 @@ test_curl:
 	  -H 'accept: application/json' \
 	  -H 'Content-Type: application/json' \
 	  -d '{"token": "aaaa", "type": "bbb", "event": {"text": "https://arxiv.org/abs/2306.12380", "type": "app_mention", "client_msg_id": "$(shell uuidgen)"}}'
+
+docker_connect:
+	docker run --rm -it \
+		--env-file ${PROJECT_DIRECTORY}/.env \
+	${IMAGE_NAME} \
+		bash
