@@ -1,4 +1,4 @@
-from asyncio import futures
+import os
 import re
 from pathlib import Path
 from typing import List, Union, Tuple
@@ -68,13 +68,13 @@ class OCRModel:
         """
         texts = []
         pil_images = self.__convert_pdf_to_pil(pdf_file)
-        with ThreadPoolExecutor(max_workers=8) as executor:
+        print("max_workers: ", os.getenv("MAX_WORKERS", 1))
+        with ThreadPoolExecutor(max_workers=int(os.getenv("MAX_WORKERS", 1))) as executor:
             results = executor.map(self.__extract_text_from_one_page, pil_images)
             for result in tqdm(results, total=len(pil_images)):
                 texts.extend(list(result[0]))
                 if result[1]:
                     break
-
 
         if not self.__is_too_long("\n".join(texts)):
             return "\n".join(texts)
