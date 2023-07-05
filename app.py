@@ -167,8 +167,6 @@ class SummarizerAPI:
         Exception
             If the request is invalid.
         """
-        print(req, payload)
-
         if os.getenv("PYTHON_ENV") == "production":
             res = await slack_app_handler.handle(req)
             if res.status_code != 200:

@@ -38,6 +38,9 @@ make deploy
 ```
 
 - On the slack api page, set the `Service URL` to Event Subscriptions > Enable Events > Request URL.
+- Note: Due to a limit on Slack apps responses, we are getting multiple requests per PDF from Slack apps to Cloud Run.
+Currently, a local file named `msg_id.log` is created, and requests with the same `client_msg_id` are not processed.
+Please be careful when setting `max-instances` in Cloud Run to anything other than 1.
 
 ## Cleanup
 
