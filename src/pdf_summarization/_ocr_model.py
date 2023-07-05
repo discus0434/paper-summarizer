@@ -68,7 +68,6 @@ class OCRModel:
         """
         texts = []
         pil_images = self.__convert_pdf_to_pil(pdf_file)
-        print("max_workers: ", os.getenv("MAX_WORKERS", 1))
         with ThreadPoolExecutor(max_workers=int(os.getenv("MAX_WORKERS", 1))) as executor:
             results = executor.map(self.__extract_text_from_one_page, pil_images)
             for result in tqdm(results, total=len(pil_images)):
