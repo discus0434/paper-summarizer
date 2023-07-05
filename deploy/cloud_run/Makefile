@@ -24,8 +24,8 @@ deploy:
 	gcloud run deploy ${GCP_IMAGE_NAME} \
 		--image=${IMAGE_NAME} \
 		--region=${GCP_REGION} \
-		--concurrency=1 \
-		--cpu=1 \
+		--concurrency=6 \
+		--cpu=2 \
 		--memory=4Gi \
 		--min-instances=0 \
 		--max-instances=1 \
