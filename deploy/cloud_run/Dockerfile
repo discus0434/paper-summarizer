@@ -48,9 +48,6 @@ ENV PYTHONUNBUFFERED True
 
 COPY --from=builder /root/.cache /root/.cache
 RUN ln -s /root/.cache /home/.cache
-# COPY --from=builder /root/.paddleocr /root/.paddleocr
-# RUN ln -s /root/.cache /home/.cache \
-#     && ln -s /root/.paddleocr /home/.paddleocr
 
 COPY --from=builder /usr/local/lib/python3.7/dist-packages /usr/local/lib/python3.7/site-packages
 COPY --from=builder /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu
