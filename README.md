@@ -57,6 +57,7 @@ echo "OPENAI_API_KEY=sk-XXX" >> .env
 echo "SLACK_INCOMING_WEBHOOK_URL=https://hooks.slack.com/services/XXX/XXX/XXX" >> .env
 echo "SLACK_SIGNING_SECRET=XXX" >> .env
 echo "SLACK_BOT_TOKEN=xoxb-XXX" >> .env
+echo "MAX_WORKERS=8" >> .env
 ```
 
 ### 5. Run the API and forward the port
@@ -76,6 +77,14 @@ python3 app.py
 ```
 
 Then, forward the port by using [ngrok](https://ngrok.com/) or something like that.
+
+## Deploy
+
+Please refer to the following procedure, recognizing that there is a cost associated with deploying this bot. Please rewrite your own account, etc. as necessary.
+
+### Cloud Run (use only CPU)
+
+Please check [README](deploy/cloud_run/README.md)
 
 ## Requirements
 

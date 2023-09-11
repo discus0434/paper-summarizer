@@ -6,12 +6,23 @@ import uvicorn
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel, validator
 
 from src.pdf_summarization import APIInterface
 
 load_dotenv()
+app = FastAPI()
+
+if os.getenv("PYTHON_ENV") == "production":
+    from slack_bolt import App
+    from slack_bolt.adapter.fastapi import SlackRequestHandler
+    slack_app = App()
+    slack_app_handler = SlackRequestHandler(slack_app)
+
+    @slack_app.event("app_mention")
+    def handle_app_mentions(body, say, logger):
+        logger.info(body)
 
 
 class SummarizeRequest(BaseModel):
@@ -125,7 +136,7 @@ class SummarizerAPI:
     """
 
     def __init__(self):
-        self.app = FastAPI()
+        self.app = app
         self.api_interface = APIInterface()
 
         self.app.add_api_route(
@@ -141,7 +152,7 @@ class SummarizerAPI:
         """
         uvicorn.run(self.app, host="0.0.0.0", port=8760)
 
-    async def summarize(self, payload: SummarizeRequest) -> Union[str, None]:
+    async def summarize(self, req: Request, payload: SummarizeRequest) -> Union[str, None]:
         """
         Summarize the given arXiv paper.
 
@@ -156,6 +167,11 @@ class SummarizerAPI:
         Exception
             If the request is invalid.
         """
+        if os.getenv("PYTHON_ENV") == "production":
+            res = await slack_app_handler.handle(req)
+            if res.status_code != 200:
+                return res
+
         if payload.challenge is not None:
             return payload.challenge
 
@@ -175,6 +191,11 @@ class SummarizerAPI:
         scheduler.start()
 
 
-if __name__ == "__main__":
+# NOTE: only download model weights in production docker build.
+if os.getenv("PYTHON_ENV") in ["production", "build", "test"]:
+    SummarizerAPI()
+
+elif __name__ == "__main__":
     api = SummarizerAPI()
-    api.run()
+    if os.getenv("PYTHON_ENV") != "build":
+        api.run()
