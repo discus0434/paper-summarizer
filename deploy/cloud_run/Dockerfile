@@ -29,7 +29,8 @@ RUN pip install --no-cache-dir opencv-python-headless \
     openai \
     python-dotenv \
     transformers \
-    nltk
+    nltk \
+    google-cloud-vision
 
 RUN pip install --no-cache-dir slack_bolt \
     && rm -r /root/.cache/pip
@@ -46,9 +47,7 @@ FROM python:3.7-slim
 ENV PYTHONUNBUFFERED True
 
 COPY --from=builder /root/.cache /root/.cache
-COPY --from=builder /root/.paddleocr /root/.paddleocr
-RUN ln -s /root/.cache /home/.cache \
-    && ln -s /root/.paddleocr /home/.paddleocr
+RUN ln -s /root/.cache /home/.cache
 
 COPY --from=builder /usr/local/lib/python3.7/dist-packages /usr/local/lib/python3.7/site-packages
 COPY --from=builder /usr/lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu
@@ -57,7 +56,6 @@ COPY --from=builder /lib/x86_64-linux-gnu/libpcre.so.3 /lib/x86_64-linux-gnu/
 COPY --from=builder /usr/bin/pdf* /usr/bin/
 COPY --from=builder /usr/bin/curl /usr/bin/curl
 
-# RUN pip install --no-cache-dir gunicorn uvicorn apscheduler
 RUN pip install --no-cache-dir gunicorn
 
 # Copy local code to the container image.
@@ -67,4 +65,4 @@ COPY . ./
 
 ENV PORT 8080
 
-CMD exec gunicorn --bind :$PORT --workers 4 --worker-class uvicorn.workers.UvicornWorker --threads 2 --timeout 0 app:app
+CMD exec gunicorn --bind :$PORT --workers 2 --worker-class uvicorn.workers.UvicornWorker --threads 8 --timeout 0 app:app

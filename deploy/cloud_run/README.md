@@ -4,7 +4,7 @@
 
 Please refer to the following procedure, recognizing that there is a cost associated with deploying this bot. Please rewrite your own account, etc. as necessary.
 
-* Before executing the following procedure, you need to enable the APIs around Cloud Run and Artifact Registry according to the official documentation, and grant the necessary permissions to the CLI login user.
+* Before executing the following procedure, you need to enable the APIs around Cloud Run, Artifact Registry and Cloud Vision API according to the official documentation, and grant the necessary permissions to the CLI login user.
 
 - Deploy as a service according to the following procedure.
 
@@ -18,6 +18,9 @@ export GCP_IMAGE_NAME=<YOUR_IMAGE_NAME ex. paper-summarizer-bot>
 # google cloud login and set deploy project
 gcloud auth login
 gcloud config set project ${GCP_PROJECT_ID}
+
+# enable apis
+gcloud services enable vision.googleapis.com artifactregistry.googleapis.com run.googleapis.com
 
 # create a repository in Artifact Registry
 gcloud artifacts repositories create ${GCP_REPOSITORY_NAME} --repository-format=docker --location=${GCP_LOCATION}
