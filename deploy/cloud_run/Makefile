@@ -47,8 +47,8 @@ test_run:
 		-v ${PROJECT_DIRECTORY}/src:/home/src \
 		-v ./cache/.cache:/root/.cache \
 		-v ./cache/.paddleocr:/root/.paddleocr \
-		-v ./radius5-ml-research-18a8df47e1d3.json:/root/radius5-ml-research-18a8df47e1d3.json \
-		--env GOOGLE_APPLICATION_CREDENTIALS=/root/radius5-ml-research-18a8df47e1d3.json \
+		-v ./local_credential.json:/root/local_credential.json \
+		--env GOOGLE_APPLICATION_CREDENTIALS=/root/local_credential.json \
 		paper-summarizer:0.1.0 \
 		/bin/bash -c "cd /home/${NAME} && uvicorn app:app --reload --port=8080 --host='0.0.0.0'"
 
